@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://d3js.org/d3.v3.js"></script>
+    <script type="text/javascript">
+
+        // making a scatter plot using D3
+        // global variables
+        // width and height (size of the SVG)
+        var w = 800;
+        var h = 450;
+        // padding helps to push elements away from edges of SVG and prevents cutoff elements
+        var padding = 70;
+        var dataset, xScale, yScale, rScale, svg;
+
+        // initial data for year 2003
+        read_data("counts2003.txt")
+
+        function read_data(filename) {
+            // read data for specified year
+            d3.json(filename, function(error, data) {
+                if (error) { // if error is not null, something went wrong
+                    console.log(error); // log the error.
+                } else { // if no error, the file loaded correctly
+                    if (dataset != null) {
+                        // make a smooth transition
+                        dataset = data;
+
+                        // update visual circles
+                        svg.selectAll("circle")
+                            .data(dataset) // bound new data
+                            .transition()
+                            .duration(1500)
+                            .ease("linear")
+                            .attr("cx", function(d) {
+                                return xScale(parseInt(d.prostitution));
+                            })
+                            .attr("cy", function(d) {
+                                return yScale(parseInt(d.vehicleThefts));
+                            })
+                            .attr("r", function(d) {
+                                return rScale(parseInt(d.totalCrimes));
+                            });
+                        // update labels
+                        svg.selectAll("text")
+                            .data(dataset)
+                            .transition()
+                            .duration(1500)
+                            .ease("linear")
+                            .text(function(d) {
+                                return d.district;
+                            })
+                            .attr("x", function(d) {
+                                return xScale(parseInt(d.prostitution));
+                            })
+                            .attr("y", function(d) {
+                                return yScale(parseInt(d.vehicleThefts));
+                            });
+                    } else {
+                        dataset = data;
+                        console.log(dataset)
+                        // set attributes of visualization
+                    }
+                }
+            });
+        }
+
+        function scales() {
+
+            // create scale functions
+            // note: d3.max function operates in arrays, not in objects. We can use d3.values(dataset) to extract all the values as an array.
+
+            // scale function for the x-axis
+            xScale = d3.scale.linear()
+                .domain([0, d3.max(dataset, function(d) { return parseInt(d.prostitution); })])
+                .range([padding, w - padding * 2]); // padding avoids cutoff text
+
+            // scale function for the y-axis
+            yScale = d3.scale.linear()
+                .domain([0, d3.max(dataset, function(d) { return parseInt(d.vehicleThefts); })])
+                .range([h - padding, padding]); // high values of y are at the top and low values at the bottom.
+
+            // scale function for the circle sizes
+            rScale = d3.scale.linear()
+                .domain([0, d3.max(dataset, function(d) { return parseInt(d.totalCrimes); })])
+                .range([3, 20]);
+        }
+
+        function scatterplot() {
+
+            // create SVG element
+            svg = d3.select("div#B")
+                .append("svg")
+                .attr("width", w)
+                .attr("height", h);
+
+            // define clipping path, prevent circle elements from going out of bounds
+            svg.append("clipPath")
+                .attr("id", "chart-area")
+                .append("rect")		// within the clipPath, create a new rect
+                .attr("x", padding)	// set rect's position and size...
+                .attr("y", padding)
+                .attr("width", w - padding * 3)
+                .attr("height", h - padding * 2);
+
+            // circle for each data point with x and y coordinates and radius
+            // do not go out of bounds
+            svg.append("g")
+                .attr("id", "circles")					// assign ID of 'circles'
+                .attr("clip-path", "url(#chart-area)")	// add reference to clipPath
+                .selectAll("circle")
+                .data(dataset)
+                .enter()
+                .append("circle")
+                .attr("cx", function(d) {
+                    return xScale(parseInt(d.prostitution));
+                })
+                .attr("cy", function(d) {
+                    return yScale(parseInt(d.vehicleThefts));
+                })
+                .attr("r", function(d) {
+                    return rScale(parseInt(d.totalCrimes));
+                })
+                .attr('opacity', 0.3);
+
+            // labels
+            svg.selectAll("text")
+                .data(dataset)
+                .enter()
+                .append("text")
+                .text(function(d) {
+                    return d.district;
+                })
+                .attr("x", function(d) {
+                    return xScale(parseInt(d.prostitution));
+                })
+                .attr("y", function(d) {
+                    return yScale(parseInt(d.vehicleThefts));
+                })
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "10px")
+                .attr("fill", "#483D8B")
+                .attr('opacity', 1);
+
+        }
+        function scatterplot() {
+
+
+            // define clipping path, prevent circle elements from going out of bounds
+            svg.append("clipPath")
+                .attr("id", "chart-area")
+                .append("rect")		// within the clipPath, create a new rect
+                .attr("x", padding)	// set rect's position and size...
+                .attr("y", padding)
+                .attr("width", w - padding * 3)
+                .attr("height", h - padding * 2);
+
+            // circle for each data point with x and y coordinates and radius
+            // do not go out of bounds
+            svg.append("g")
+                .attr("id", "circles")					// assign ID of 'circles'
+                .attr("clip-path", "url(#chart-area)")	// add reference to clipPath
+                .selectAll("circle")
+                .data(dataset)
+                .enter()
+                .append("circle")
+                .attr("cx", function(d) {
+                    return xScale(parseInt(d.prostitution));
+                })
+                .attr("cy", function(d) {
+                    return yScale(parseInt(d.vehicleThefts));
+                })
+                .attr("r", function(d) {
+                    return rScale(parseInt(d.totalCrimes));
+                })
+                .attr('opacity', 0.3);
+
+            // labels
+            svg.selectAll("text")
+                .data(dataset)
+                .enter()
+                .append("text")
+                .text(function(d) {
+                    return d.district;
+                })
+                .attr("x", function(d) {
+                    return xScale(parseInt(d.prostitution));
+                })
+                .attr("y", function(d) {
+                    return yScale(parseInt(d.vehicleThefts));
+                })
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "10px")
+                .attr("fill", "#483D8B")
+                .attr('opacity', 1);
+
+
+        }
+
+
+
+
+
+    </script>
+
+</head>
+<body>
+
+</body>
+</html>
