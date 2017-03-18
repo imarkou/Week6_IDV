@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>D3: Week7</title>
+    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    <!--<script type="text/javascript" src="Assignment2B.js"></script>-->
+    <style type="text/css">
+        /* No style rules here yet */
+    </style>
+</head>
+<body>
+<div class="kati">
+    <svg width="500" height="500" id="mychart"></svg>
+</div>
+
+<script type="text/javascript">
+    (function () {
+        var w = 500;
+        var h = 500;
+
+        //Create SVG element
+//        var svg = document.getElementById('mychart');
+        var svg = d3.select('#mychart');
+
+        //Data
+        d3.json("counts2003.txt", function (data) {
+            console.log(data);
+
+
+            var circles = svg.selectAll("circle")
+                .data(data)
+                .enter()
+                .append("circle")
+                .text("einai enas");
+
+        });
+
+    })()
+
+</script>
+</body>
+
+
+</html>
